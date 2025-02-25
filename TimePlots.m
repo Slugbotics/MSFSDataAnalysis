@@ -86,3 +86,9 @@ hold(ax(2), 'on');
 plot(ax(2), timeMinutes, ambient_pressure, '-r');
 plot(ax(2), timeMinutes, ambient_temperature, '-g');
 legend(ax(2), 'Speed', 'Ambient Pressure', 'Ambient Temperature');
+
+% Add additional y-axes for ambient pressure and temperature
+yyaxis right;
+ylabel('Ambient Pressure (Pa)');
+yyaxis left;
+ylabel('Ambient Temperature (°C)');
