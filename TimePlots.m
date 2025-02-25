@@ -12,6 +12,9 @@ timeMinutes = minutes(time - startTime);
 % Create the altitude plot
 figure;
 plot(timeMinutes, altitude, '-');
+hold on;
+fill([timeMinutes; flipud(timeMinutes)], [altitude; zeros(size(altitude))], 'b', 'FaceAlpha', 0.3, 'EdgeColor', 'none');
+hold off;
 
 % Customize the altitude graph
 title('Altitude Over Time');
