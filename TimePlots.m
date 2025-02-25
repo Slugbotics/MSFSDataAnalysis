@@ -81,15 +81,8 @@ plot(ax(1), timeMinutes, ambient_density, '-b');
 fill(ax(1), [timeMinutes; flipud(timeMinutes)], [altitude; zeros(size(altitude))], 'b', 'FaceAlpha', 0.3, 'EdgeColor', 'none');
 legend(ax(1), 'Altitude', 'Ambient Density');
 
-% Add ambient pressure to the unified plot
-yyaxis right;
-plot(timeMinutes, ambient_pressure, '-r');
-ax(2).YLabel.String = 'Ambient Pressure (Pa)';
-
-% Add ambient temperature to the unified plot
-yyaxis left;
-plot(timeMinutes, ambient_temperature, '-g');
-ax(1).YLabel.String = 'Ambient Temperature (°C)';
-
-% Update the legend
-legend('Altitude', 'Ambient Density', 'Speed', 'Ambient Pressure', 'Ambient Temperature');
+% Add ambient pressure and temperature to the unified plot
+hold(ax(2), 'on');
+plot(ax(2), timeMinutes, ambient_pressure, '-r');
+plot(ax(2), timeMinutes, ambient_temperature, '-g');
+legend(ax(2), 'Speed', 'Ambient Pressure', 'Ambient Temperature');
