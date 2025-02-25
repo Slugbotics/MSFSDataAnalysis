@@ -85,4 +85,4 @@ legend(ax(1), 'Altitude', 'Ambient Density');
 hold(ax(2), 'on');
 plot(ax(2), timeMinutes, ambient_pressure, '-r');
 plot(ax(2), timeMinutes, ambient_temperature, '-g');
-legend(ax(2), 'Speed', 'Ambient Pressure', 'Ambient Temperature');
+legend(ax(2), 'Speed', 'Ambient Pressure', 'Ambient Temperature', 'Ambient Density');
