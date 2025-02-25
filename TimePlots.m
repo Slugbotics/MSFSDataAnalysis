@@ -147,7 +147,6 @@ grid on;
 % Create a unified plot for wind components
 figure;
 hold on;
-plot(timeMinutes, ambient_wind_direction, '-g')
 plot(timeMinutes, ambient_wind_x, '-k');
 plot(timeMinutes, ambient_wind_y, '--b');
 plot(timeMinutes, ambient_wind_z, '--r');
