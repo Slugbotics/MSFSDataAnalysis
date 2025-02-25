@@ -4,6 +4,13 @@ speed = as_true;
 ambient_density = a_dens;
 ambient_pressure = a_pres;
 ambient_temperature = OAT;
+ambient_visibility = vis;
+ambient_wind_direction = wind_dir;
+ambient_wind_velocity = wind_vel;
+ambient_wind_x = a_wind_x;
+ambient_wind_y = a_wind_y;
+ambient_wind_z = a_wind_z;
+barometer_pressure = b_pres;
 
 % Convert time to minutes after the first time
 startTime = time(1);
@@ -62,27 +69,94 @@ xlabel('Time (minutes)');
 ylabel('Ambient Temperature (°C)');
 grid on;
 
-% Create a unified plot
+% Create the ambient visibility plot
 figure;
-[ax, h1, h2] = plotyy(timeMinutes, altitude, timeMinutes, speed);
+plot(timeMinutes, ambient_visibility, '-');
 
-% Customize the unified graph
-title('Altitude, Speed, and Ambient Conditions Over Time');
+% Customize the ambient visibility graph
+title('Ambient Visibility Over Time');
 xlabel('Time (minutes)');
-ax(1).YLabel.String = 'Altitude (feet)';
-ax(2).YLabel.String = 'Speed (knots)';
-h1.LineStyle = '-';
-h2.LineStyle = '-';
+ylabel('Ambient Visibility (miles)');
 grid on;
 
-% Add ambient density to the unified plot
-hold(ax(1), 'on');
-plot(ax(1), timeMinutes, ambient_density, '-b');
-fill(ax(1), [timeMinutes; flipud(timeMinutes)], [altitude; zeros(size(altitude))], 'b', 'FaceAlpha', 0.3, 'EdgeColor', 'none');
-legend(ax(1), 'Altitude', 'Ambient Density');
+% Create the ambient wind direction plot
+figure;
+plot(timeMinutes, ambient_wind_direction, '-');
 
-% Add ambient pressure and temperature to the unified plot
-hold(ax(2), 'on');
-plot(ax(2), timeMinutes, ambient_pressure, '-r');
-plot(ax(2), timeMinutes, ambient_temperature, '-g');
-legend(ax(2), 'Speed', 'Ambient Pressure', 'Ambient Temperature', 'Ambient Density');
+% Customize the ambient wind direction graph
+title('Ambient Wind Direction Over Time');
+xlabel('Time (minutes)');
+ylabel('Ambient Wind Direction (degrees)');
+grid on;
+
+% Create the ambient wind velocity plot
+figure;
+plot(timeMinutes, ambient_wind_velocity, '-');
+
+% Customize the ambient wind velocity graph
+title('Ambient Wind Velocity Over Time');
+xlabel('Time (minutes)');
+ylabel('Ambient Wind Velocity (knots)');
+grid on;
+
+% Create the ambient wind X component plot
+figure;
+plot(timeMinutes, ambient_wind_x, '-');
+
+% Customize the ambient wind X component graph
+title('Ambient Wind X Component Over Time');
+xlabel('Time (minutes)');
+ylabel('Ambient Wind X Component (m/s)');
+grid on;
+
+% Create the ambient wind Y component plot
+figure;
+plot(timeMinutes, ambient_wind_y, '-');
+
+% Customize the ambient wind Y component graph
+title('Ambient Wind Y Component Over Time');
+xlabel('Time (minutes)');
+ylabel('Ambient Wind Y Component (m/s)');
+grid on;
+
+% Create the ambient wind Z component plot
+figure;
+plot(timeMinutes, ambient_wind_z, '-');
+
+% Customize the ambient wind Z component graph
+title('Ambient Wind Z Component Over Time');
+xlabel('Time (minutes)');
+ylabel('Ambient Wind Z Component (m/s)');
+grid on;
+
+% Create the barometer pressure plot
+figure;
+plot(timeMinutes, barometer_pressure, '-');
+
+% Customize the barometer pressure graph
+title('Barometer Pressure Over Time');
+xlabel('Time (minutes)');
+ylabel('Barometer Pressure (Pa)');
+grid on;
+
+% Create a unified plot for ambient conditions
+figure;
+hold on;
+plot(timeMinutes, ambient_density, '-b');
+plot(timeMinutes, ambient_pressure, '-r');
+plot(timeMinutes, ambient_temperature, '-g');
+plot(timeMinutes, ambient_visibility, '-c');
+plot(timeMinutes, ambient_wind_direction, '-m');
+plot(timeMinutes, ambient_wind_velocity, '-y');
+plot(timeMinutes, ambient_wind_x, '-k');
+plot(timeMinutes, ambient_wind_y, '--b');
+plot(timeMinutes, ambient_wind_z, '--r');
+plot(timeMinutes, barometer_pressure, '--g');
+hold off;
+
+% Customize the unified ambient conditions graph
+title('Ambient Conditions Over Time');
+xlabel('Time (minutes)');
+ylabel('Values');
+legend('Ambient Density', 'Ambient Pressure', 'Ambient Temperature', 'Ambient Visibility', 'Ambient Wind Direction', 'Ambient Wind Velocity', 'Ambient Wind X', 'Ambient Wind Y', 'Ambient Wind Z', 'Barometer Pressure');
+grid on;
