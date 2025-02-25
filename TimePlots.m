@@ -129,20 +129,19 @@ xlabel('Time (minutes)');
 ylabel('Barometer Pressure (Pa)');
 grid on;
 
-% Create a unified plot for ambient density, temperature, pressure, and barometer pressure
+% Create a unified plot for ambient density, temperature, and pressure
 figure;
 hold on;
 plot(timeMinutes, ambient_density, '-b');
 plot(timeMinutes, ambient_pressure, '-r');
 plot(timeMinutes, ambient_temperature, '-g');
-plot(timeMinutes, barometer_pressure, '--g');
 hold off;
 
 % Customize the unified ambient conditions graph
-title('Ambient Density, Temperature, Pressure, and Barometer Pressure Over Time');
+title('Ambient Density, Temperature, and Pressure Over Time');
 xlabel('Time (minutes)');
 ylabel('Values');
-legend('Ambient Density', 'Ambient Pressure', 'Ambient Temperature', 'Barometer Pressure');
+legend('Ambient Density', 'Ambient Pressure', 'Ambient Temperature');
 grid on;
 
 % Create a unified plot for wind components
