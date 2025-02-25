@@ -89,24 +89,14 @@ xlabel('Time (minutes)');
 ylabel('Ambient Wind Direction (degrees)');
 grid on;
 
-% Create the ambient wind velocity plot
-figure;
-plot(timeMinutes, ambient_wind_velocity, '-');
-
-% Customize the ambient wind velocity graph
-title('Ambient Wind Velocity Over Time');
-xlabel('Time (minutes)');
-ylabel('Ambient Wind Velocity (knots)');
-grid on;
-
-% Create the ambient wind X component plot
+% Create the ambient wind X component plotlot
 figure;
 plot(timeMinutes, ambient_wind_x, '-');
 
-% Customize the ambient wind X component graph
-title('Ambient Wind X Component Over Time');
+% Customize the ambient wind X component graphaph
+title('Ambient Wind X Component Over Time');');
 xlabel('Time (minutes)');
-ylabel('Ambient Wind X Component (m/s)');
+ylabel('Ambient Wind X Component (m/s)');;
 grid on;
 
 % Create the ambient wind Y component plot
@@ -131,7 +121,7 @@ grid on;
 
 % Create the barometer pressure plot
 figure;
-plot(timeMinutes, barometer_pressure, '-');
+plot(timeMinutes, barometer_pressure, '-');-');
 
 % Customize the barometer pressure graph
 title('Barometer Pressure Over Time');
@@ -139,43 +129,43 @@ xlabel('Time (minutes)');
 ylabel('Barometer Pressure (Pa)');
 grid on;
 
-% Create a unified plot for ambient density, temperature, pressure, and barometer pressure
+% Create a unified plot for ambient density, temperature, pressure, and barometer pressuredensity, temperature, pressure, and barometer pressure
 figure;
 hold on;
-plot(timeMinutes, ambient_density, '-b');
-plot(timeMinutes, ambient_pressure, '-r');
-plot(timeMinutes, ambient_temperature, '-g');
-plot(timeMinutes, barometer_pressure, '--g');
+plot(timeMinutes, ambient_density, '-b');plot(timeMinutes, ambient_density, '-b');
+plot(timeMinutes, ambient_pressure, '-r'););
+plot(timeMinutes, ambient_temperature, '-g'); '-g');
+plot(timeMinutes, barometer_pressure, '--g');er_pressure, '--g');
 hold off;
 
-% Customize the unified ambient conditions graph
+% Customize the unified ambient conditions graph% Customize the unified ambient conditions graph
 title('Ambient Density, Temperature, Pressure, and Barometer Pressure Over Time');
-xlabel('Time (minutes)');
-ylabel('Values');
-legend('Ambient Density', 'Ambient Pressure', 'Ambient Temperature', 'Barometer Pressure');
+xlabel('Time (minutes)');'Time (minutes)');
+ylabel('Values');Values');
+legend('Ambient Density', 'Ambient Pressure', 'Ambient Temperature', 'Barometer Pressure');re', 'Ambient Temperature', 'Barometer Pressure');
 grid on;
 
 % Create a unified plot for wind components
 figure;
-hold on;
+hold on;hold on;
 plot(timeMinutes, ambient_wind_x, '-k');
 plot(timeMinutes, ambient_wind_y, '--b');
-plot(timeMinutes, ambient_wind_z, '--r');
+plot(timeMinutes, ambient_wind_z, '--r');_wind_z, '--r');
 hold off;
 
-% Customize the unified wind components graph
-title('Wind Components Over Time');
+% Customize the unified wind components graphize the unified wind components graph
+title('Wind Components Over Time');title('Wind Components Over Time');
 xlabel('Time (minutes)');
-ylabel('Values');
-legend('Wind X', 'Wind Y', 'Wind Z');
+ylabel('Values');'Values');
+legend('Wind X', 'Wind Y', 'Wind Z');Wind X', 'Wind Y', 'Wind Z');
 grid on;
 
 % Create a plot for ambient visibility
 figure;
-plot(timeMinutes, ambient_visibility, '-');
+plot(timeMinutes, ambient_visibility, '-');plot(timeMinutes, ambient_visibility, '-');
 
-% Customize the ambient visibility graph
-title('Ambient Visibility Over Time');
-xlabel('Time (minutes)');
+% Customize the ambient visibility graphgraph
+title('Ambient Visibility Over Time'); Over Time');
+xlabel('Time (minutes)');utes)');
 ylabel('Ambient Visibility (miles)');
 grid on;
