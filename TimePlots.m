@@ -155,21 +155,19 @@ ylabel('Values');
 legend('Ambient Density', 'Ambient Pressure', 'Ambient Temperature', 'Barometer Pressure');
 grid on;
 
-% Create a unified plot for wind direction, velocity, and wind components
+% Create a unified plot for wind components
 figure;
 hold on;
-plot(timeMinutes, ambient_wind_direction, '-m');
-plot(timeMinutes, ambient_wind_velocity, '-y');
 plot(timeMinutes, ambient_wind_x, '-k');
 plot(timeMinutes, ambient_wind_y, '--b');
 plot(timeMinutes, ambient_wind_z, '--r');
 hold off;
 
-% Customize the unified wind conditions graph
-title('Wind Direction, Velocity, and Components Over Time');
+% Customize the unified wind components graph
+title('Wind Components Over Time');
 xlabel('Time (minutes)');
 ylabel('Values');
-legend('Wind Direction', 'Wind Velocity', 'Wind X', 'Wind Y', 'Wind Z');
+legend('Wind X', 'Wind Y', 'Wind Z');
 grid on;
 
 % Create a plot for ambient visibility
