@@ -8,6 +8,7 @@ Bank();
 Heading();
 Pitch();
 ControlSurfaces();
+Fuel()
 
 GroundElevation();
 %{
