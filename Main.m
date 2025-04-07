@@ -1,4 +1,4 @@
-data = Database(32);
+data = Database(40);
 t = data.time_inserted; 
 
 MapPos();
