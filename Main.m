@@ -9,6 +9,7 @@ Heading();
 Pitch();
 ControlSurfaces();
 Fuel()
+EnergyCalculation();
 
 GroundElevation();
 %{
