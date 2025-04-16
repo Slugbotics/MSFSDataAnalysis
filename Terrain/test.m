@@ -10,28 +10,43 @@ heightList = a_msl;
 [A, R] = readgeoraster('../TerrainData/output_USGS10m_eg.tif');
 
 %% Create masks based on the elevation relative to refAlt
-% Define the thresholds
-redThreshold = heightList - 100;     % 100 ft below or above => red
-yellowLow = heightList - 1000;       % 1000 ft below the ref altitude
-yellowHigh = heightList - 100;       % upper limit for yellow
+% Initialize a cell array to store masks for each index of heightList
+redMasks = cell(length(heightList), 1);
+yellowMasks = cell(length(heightList), 1);
 
-% Create logical masks
-redMask = (A >= redThreshold);                     % pixels that are 100 ft below or above
-yellowMask = (A >= yellowLow) & (A < yellowHigh);    % pixels within 1000 ft but not in red range
+% Loop through each index of heightList
+for i = 1:length(heightList)
+    % Define the thresholds for the current height
+    redThreshold = heightList(i) - 100;     % 100 ft below or above => red
+    yellowLow = heightList(i) - 1000;       % 1000 ft below the ref altitude
+    yellowHigh = heightList(i) - 100;       % upper limit for yellow
+
+    % Create logical masks for the current height
+    redMasks{i} = (A >= redThreshold);                     % pixels that are 100 ft below or above
+    yellowMasks{i} = (A >= yellowLow) & (A < yellowHigh);  % pixels within 1000 ft but not in red range
+end
 
 %% Build an RGB image for the heatmap
 % Initialize an RGB image array the same size as the DEM.
 RGB = zeros([size(A) 3]);
 
+% Combine masks for all indices of heightList
+combinedRedMask = false(size(A));
+combinedYellowMask = false(size(A));
+for i = 1:length(heightList)
+    combinedRedMask = combinedRedMask | redMasks{i};
+    combinedYellowMask = combinedYellowMask | yellowMasks{i};
+end
+
 % For red pixels, set the red channel to 1.
-RGB(:,:,1) = redMask;
+RGB(:,:,1) = combinedRedMask;
 
 % For yellow pixels, set red and green channels to 1.
-RGB(:,:,1) = RGB(:,:,1) | yellowMask;  % ensure red channel is on for yellow too
-RGB(:,:,2) = yellowMask;               % green channel on
+RGB(:,:,1) = RGB(:,:,1) | combinedYellowMask;  % ensure red channel is on for yellow too
+RGB(:,:,2) = combinedYellowMask;               % green channel on
 
 % Build an alpha channel: opaque (1) for red or yellow pixels, transparent (0) otherwise.
-alphaChannel = double(redMask | yellowMask);
+alphaChannel = double(combinedRedMask | combinedYellowMask);
 
 %% Display the heatmap overlay on a satellite base (or fallback to grayscale DEM)
 figure;
