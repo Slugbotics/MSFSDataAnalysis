@@ -11,9 +11,9 @@ heightList = a_msl;
 
 %% Create masks based on the elevation relative to refAlt
 % Define the thresholds
-redThreshold = heightList(i) - 100;     % 100 ft below or above => red
-yellowLow = heightList(i) - 1000;       % 1000 ft below the ref altitude
-yellowHigh = heightList(i) - 100;       % upper limit for yellow
+redThreshold = heightList - 100;     % 100 ft below or above => red
+yellowLow = heightList - 1000;       % 1000 ft below the ref altitude
+yellowHigh = heightList - 100;       % upper limit for yellow
 
 % Create logical masks
 redMask = (A >= redThreshold);                     % pixels that are 100 ft below or above
