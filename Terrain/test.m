@@ -7,7 +7,7 @@ heightList = a_msl;
 %% Read the terrain data from a .tif file
 % This reads the DEM (Digital Elevation Model) and its spatial referencing info.
 % Replace 'terrain.tif' with your file.
-[A, R] = readgeoraster('../TerrainData/output_USGS10m_eg.tif');
+[A, R] = readgeoraster('/TerrainData/output_USGS10m_eg.tif');
 
 %% Create masks based on the elevation relative to refAlt
 % Initialize a cell array to store masks for each index of heightList
