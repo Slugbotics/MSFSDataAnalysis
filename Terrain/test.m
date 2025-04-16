@@ -4,10 +4,6 @@ latList = p_lat;
 lonList = p_lon;
 heightList = a_msl;
 
-refLat = latList;      % example latitude (e.g., New York City)
-refLon = lonList;    % example longitude
-refAlt = heightList;      % example altitude in feet
-
 %% Read the terrain data from a .tif file
 % This reads the DEM (Digital Elevation Model) and its spatial referencing info.
 % Replace 'terrain.tif' with your file.
@@ -15,9 +11,9 @@ refAlt = heightList;      % example altitude in feet
 
 %% Create masks based on the elevation relative to refAlt
 % Define the thresholds
-redThreshold = refAlt - 100;     % 100 ft below or above => red
-yellowLow = refAlt - 1000;       % 1000 ft below the ref altitude
-yellowHigh = refAlt - 100;       % upper limit for yellow
+redThreshold = latList - 100;     % 100 ft below or above => red
+yellowLow = lonList - 1000;       % 1000 ft below the ref altitude
+yellowHigh = heightList - 100;       % upper limit for yellow
 
 % Create logical masks
 redMask = (A >= redThreshold);                     % pixels that are 100 ft below or above
