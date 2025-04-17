@@ -45,16 +45,18 @@ RGB = zeros([size(A) 3]);
 % For red pixels, set the red channel to 1.
 RGB(:,:,1) = redMasks{1};
 
+time = first;
+
 % For yellow pixels, set red and green channels to 1.
-RGB(:,:,1) = RGB(:,:,1) | yellowMasks{middle};  % ensure red channel is on for yellow too
-RGB(:,:,2) = RGB(:,:,2) | yellowMasks{middle};  % ensure green channel is on for yellow
+RGB(:,:,1) = RGB(:,:,1) | yellowMasks{time};  % ensure red channel is on for yellow too
+RGB(:,:,2) = RGB(:,:,2) | yellowMasks{time};  % ensure green channel is on for yellow
 
 % For green pixels, set only the green channel to 1 where red or yellow aren't.
-greenOnlyMask = greenMasks{middle} & ~redMasks{middle} & ~yellowMasks{middle};
+greenOnlyMask = greenMasks{time} & ~redMasks{time} & ~yellowMasks{time};
 RGB(:,:,2) = RGB(:,:,2) | greenOnlyMask;  % ensure green channel is on for green-only areas
 
 % Build an alpha channel: opaque (1) for red, yellow, or green pixels, transparent (0) otherwise.
-alphaChannel = double(redMasks{middle} | yellowMasks{middle} | greenOnlyMask);
+alphaChannel = double(redMasks{time} | yellowMasks{time} | greenOnlyMask);
 
 %% Display the heatmap overlay on a satellite base (or fallback to grayscale DEM)
 figure;
