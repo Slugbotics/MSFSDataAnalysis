@@ -1,3 +1,9 @@
+%% Parameters
+% Reference coordinate and altitude (in feet)
+latList = p_lat;   
+lonList = p_lon;
+heightList = a_msl;
+
 %% Read the terrain data from a .tif file
 % This reads the DEM (Digital Elevation Model) and its spatial referencing info.
 % Replace 'terrain.tif' with your file.
