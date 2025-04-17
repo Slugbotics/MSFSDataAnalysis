@@ -3,6 +3,9 @@
 latList = p_lat;   
 lonList = p_lon;
 heightList = a_msl;
+numIntervals = 10;
+indices = round(linspace(1, length(heightList), numIntervals));
+first = indices(1);
 
 %% Read the terrain data from a .tif file
 % This reads the DEM (Digital Elevation Model) and its spatial referencing info.
@@ -23,10 +26,11 @@ yellowHigh = heightList(i) - 100;       % upper limit for yellow
 redMasks = cell(length(heightList), 1);
 yellowMasks = cell(length(heightList), 1);
 
-for i = 1:60:length(heightList)
+for idx = 1:numIntervals
+    i = indices(idx);
     % Create logical masks for the current height
-    redMasks{i} = (A >= redThreshold);                     % pixels that are 100 ft below or above
-    yellowMasks{i} = (A >= yellowLow) & (A < yellowHigh);  % pixels within 1000 ft but not in red range
+    redMasks{i} = (A >= heightList(i) - 100);                     % pixels that are 100 ft below or above
+    yellowMasks{i} = (A >= heightList(i) - 1000) & (A < heightList(i) - 100);  % pixels within 1000 ft but not in red range
 end
 
 %% Build an RGB image for the heatmap
