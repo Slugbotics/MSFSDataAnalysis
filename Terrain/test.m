@@ -4,10 +4,10 @@ latList = p_lat;
 lonList = p_lon;
 heightList = a_msl;
 numIntervals = 10;
-timestep = round(linspace(1, length(heightList), numIntervals));
-first = timestep(1);
-middle = timestep(round(numIntervals / 2));
-last = timestep(end);
+indices = round(linspace(1, length(heightList), numIntervals));
+first = indices(1);
+middle = indices(round(numIntervals / 2));
+last = indices(end);
 
 %% Read the terrain data from a .tif file
 % This reads the DEM (Digital Elevation Model) and its spatial referencing info.
@@ -30,7 +30,7 @@ yellowMasks = cell(length(heightList), 1);
 greenMasks = cell(length(heightList), 1);
 
 for idx = 1:numIntervals
-    i = timestep(idx);
+    i = indices(idx);
     % Create logical masks for the current height
     redMasks{i} = (A >= heightList(i) - 100);                     % pixels that are 100 ft below or above
     yellowMasks{i} = (A >= heightList(i) - 1000) & (A < heightList(i) - 100);  % pixels within 1000 ft but not in red range
@@ -76,13 +76,13 @@ slider = uicontrol('Style', 'slider', ...
 % Add a text label to display the current time index
 sliderLabel = uicontrol('Style', 'text', ...
                         'Position', [330 20 50 20], ...
-                        'String', sprintf('Idx: %d', first));
+                        'String', sprintf('Idx: %d', timestep(1)));
 
 % Callback function to update the heatmap when the slider is moved
 function updateHeatmap(slider, ~)
     % Get the current slider value and round it to the nearest index
     sliderValue = round(slider.Value);
-    time = timestep(sliderValue);
+    time = timestep(sliderValue); % Use the slider value to get the corresponding index in timestep
 
     % Update the RGB image for the selected time
     RGB = zeros([size(A) 3]);
