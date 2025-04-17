@@ -79,7 +79,7 @@ sliderLabel = uicontrol('Style', 'text', ...
                         'String', sprintf('Idx: %d', first));
 
 % Callback function to update the heatmap when the slider is moved
-function updateHeatmap(~, ~)
+function updateHeatmap(slider, ~)
     % Get the current slider value and round it to the nearest index
     sliderValue = round(slider.Value);
     time = indices(sliderValue);
@@ -100,10 +100,10 @@ function updateHeatmap(~, ~)
 end
 
 % Set the slider callback to the updateHeatmap function
-slider.Callback = @updateHeatmap;
+slider.Callback = @(src, event) updateHeatmap(src, event);
 
 % Initialize the heatmap for the first time index
-updateHeatmap();
+updateHeatmap(slider);
 
 hold off;
 title('Terrain Heatmap with Interactive Slider');
