@@ -1,9 +1,3 @@
-%% Parameters
-% Reference coordinate and altitude (in feet)
-latList = p_lat;   
-lonList = p_lon;
-heightList = a_msl;
-
 %% Read the terrain data from a .tif file
 % This reads the DEM (Digital Elevation Model) and its spatial referencing info.
 % Replace 'terrain.tif' with your file.
@@ -27,26 +21,18 @@ for i = 1:30:length(heightList)
 end
 
 %% Build an RGB image for the heatmap
-% Initialize an RGB image array the same size as the DEM, using uint8 to save memory.
-RGB = zeros([size(A), 3], 'uint8');  % Use uint8 instead of double to reduce memory usage.
-
-% Combine masks for every 30th index of heightList
-combinedRedMask = false(size(A));
-combinedYellowMask = false(size(A));
-for i = 1:length(heightList)  % Step size of 30
-    combinedRedMask = combinedRedMask | redMasks{i};
-    combinedYellowMask = combinedYellowMask | yellowMasks{i};
-end
+% Initialize an RGB image array the same size as the DEM.
+RGB = zeros([size(A) 3]);
 
 % For red pixels, set the red channel to 1.
-RGB(:,:,1) = combinedRedMask;
+RGB(:,:,1) = redMask;
 
 % For yellow pixels, set red and green channels to 1.
-RGB(:,:,1) = RGB(:,:,1) | combinedYellowMask;  % ensure red channel is on for yellow too
-RGB(:,:,2) = combinedYellowMask;               % green channel on
+RGB(:,:,1) = RGB(:,:,1) | yellowMask;  % ensure red channel is on for yellow too
+RGB(:,:,2) = yellowMask;               % green channel on
 
 % Build an alpha channel: opaque (1) for red or yellow pixels, transparent (0) otherwise.
-alphaChannel = double(combinedRedMask | combinedYellowMask);
+alphaChannel = double(redMask | yellowMask);
 
 %% Display the heatmap overlay on a satellite base (or fallback to grayscale DEM)
 figure;
