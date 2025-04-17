@@ -14,13 +14,16 @@ heightList = a_msl;
 redMasks = cell(length(heightList), 1);
 yellowMasks = cell(length(heightList), 1);
 
-% Loop through each index of heightList
-for i = 1:30:length(heightList)
-    % Define the thresholds for the current height
-    redThreshold = heightList(i) - 100;     % 100 ft below or above => red
-    yellowLow = heightList(i) - 1000;       % 1000 ft below the ref altitude
-    yellowHigh = heightList(i) - 100;       % upper limit for yellow
+% Define the thresholds for the current height
+redThreshold = heightList(i) - 100;     % 100 ft below or above => red
+yellowLow = heightList(i) - 1000;       % 1000 ft below the ref altitude
+yellowHigh = heightList(i) - 100;       % upper limit for yellow
 
+% Initialize a cell array to store masks for each index of heightList
+redMasks = cell(length(heightList), 1);
+yellowMasks = cell(length(heightList), 1);
+
+for i = 1:60:length(heightList)
     % Create logical masks for the current height
     redMasks{i} = (A >= redThreshold);                     % pixels that are 100 ft below or above
     yellowMasks{i} = (A >= yellowLow) & (A < yellowHigh);  % pixels within 1000 ft but not in red range
