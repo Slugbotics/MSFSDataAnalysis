@@ -25,12 +25,15 @@ yellowHigh = heightList(i) - 100;       % upper limit for yellow
 % Initialize a cell array to store masks for each index of heightList
 redMasks = cell(length(heightList), 1);
 yellowMasks = cell(length(heightList), 1);
+greenMasks = cell(length(heightList), 1);
 
 for idx = 1:numIntervals
     i = indices(idx);
     % Create logical masks for the current height
     redMasks{i} = (A >= heightList(i) - 100);                     % pixels that are 100 ft below or above
     yellowMasks{i} = (A >= heightList(i) - 1000) & (A < heightList(i) - 100);  % pixels within 1000 ft but not in red range
+    greenMasks{i} = (A < heightList(i) - 1000);                 % pixels that are below 1000 ft
+
 end
 
 %% Build an RGB image for the heatmap
