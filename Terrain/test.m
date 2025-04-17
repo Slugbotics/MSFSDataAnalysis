@@ -15,7 +15,7 @@ redMasks = cell(length(heightList), 1);
 yellowMasks = cell(length(heightList), 1);
 
 % Loop through each index of heightList
-for i = 1:length(heightList)
+for i = 1:30:length(heightList)
     % Define the thresholds for the current height
     redThreshold = heightList(i) - 100;     % 100 ft below or above => red
     yellowLow = heightList(i) - 1000;       % 1000 ft below the ref altitude
@@ -27,13 +27,13 @@ for i = 1:length(heightList)
 end
 
 %% Build an RGB image for the heatmap
-% Initialize an RGB image array the same size as the DEM.
-RGB = zeros([size(A) 3]);
+% Initialize an RGB image array the same size as the DEM, using uint8 to save memory.
+RGB = zeros([size(A), 3], 'uint8');  % Use uint8 instead of double to reduce memory usage.
 
-% Combine masks for all indices of heightList
+% Combine masks for every 30th index of heightList
 combinedRedMask = false(size(A));
 combinedYellowMask = false(size(A));
-for i = 1:length(heightList)
+for i = 1:length(heightList)  % Step size of 30
     combinedRedMask = combinedRedMask | redMasks{i};
     combinedYellowMask = combinedYellowMask | yellowMasks{i};
 end
