@@ -4,10 +4,10 @@ latList = p_lat;
 lonList = p_lon;
 heightList = a_msl;
 numIntervals = 10;
-indices = round(linspace(1, length(heightList), numIntervals));
-first = indices(1);
-middle = indices(round(numIntervals / 2));
-last = indices(end);
+timestep = round(linspace(1, length(heightList), numIntervals));
+first = timestep(1);
+middle = timestep(round(numIntervals / 2));
+last = timestep(end);
 
 %% Read the terrain data from a .tif file
 % This reads the DEM (Digital Elevation Model) and its spatial referencing info.
@@ -30,7 +30,7 @@ yellowMasks = cell(length(heightList), 1);
 greenMasks = cell(length(heightList), 1);
 
 for idx = 1:numIntervals
-    i = indices(idx);
+    i = timestep(idx);
     % Create logical masks for the current height
     redMasks{i} = (A >= heightList(i) - 100);                     % pixels that are 100 ft below or above
     yellowMasks{i} = (A >= heightList(i) - 1000) & (A < heightList(i) - 100);  % pixels within 1000 ft but not in red range
