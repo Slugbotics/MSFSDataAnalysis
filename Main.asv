@@ -2,11 +2,7 @@ data = Database(44);
 t = data.time_inserted; 
 
 MapPos();
-
-addpath(genpath('./Terrain/'));
-addpath(genpath('./TerrainData/'));
-test();
-
+./Terrain/test();
 %{
 SpeedAltitudePlots();
 
