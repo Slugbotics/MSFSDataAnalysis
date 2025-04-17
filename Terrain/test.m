@@ -6,6 +6,8 @@ heightList = a_msl;
 numIntervals = 10;
 indices = round(linspace(1, length(heightList), numIntervals));
 first = indices(1);
+middle = indices(round(numIntervals / 2));
+last = indices(end);
 
 %% Read the terrain data from a .tif file
 % This reads the DEM (Digital Elevation Model) and its spatial referencing info.
@@ -44,11 +46,12 @@ RGB = zeros([size(A) 3]);
 RGB(:,:,1) = redMasks{1};
 
 % For yellow pixels, set red and green channels to 1.
-RGB(:,:,1) = RGB(:,:,1) | yellowMasks{1};  % ensure red channel is on for yellow too
-RGB(:,:,2) = yellowMasks{1};               % green channel on
+RGB(:,:,1) = RGB(:,:,1) | yellowMasks{middle};  % ensure red channel is on for yellow too
+RGB(:,:,2) = yellowMasks{middle};               % yellow channel on
+RGB(:,:,3) = yellowMasks{middle};
 
 % Build an alpha channel: opaque (1) for red or yellow pixels, transparent (0) otherwise.
-alphaChannel = double(redMasks{1} | yellowMasks{1});
+alphaChannel = double(redMasks{middle} | yellowMasks{middle});
 
 %% Display the heatmap overlay on a satellite base (or fallback to grayscale DEM)
 figure;
