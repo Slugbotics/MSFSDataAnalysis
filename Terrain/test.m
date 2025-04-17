@@ -34,11 +34,11 @@ end
 RGB = zeros([size(A) 3]);
 
 % For red pixels, set the red channel to 1.
-RGB(:,:,1) = redMask;
+RGB(:,:,1) = redMasks{100};
 
 % For yellow pixels, set red and green channels to 1.
-RGB(:,:,1) = RGB(:,:,1) | yellowMask;  % ensure red channel is on for yellow too
-RGB(:,:,2) = yellowMask;               % green channel on
+RGB(:,:,1) = RGB(:,:,1) | yellowMasks{100};  % ensure red channel is on for yellow too
+RGB(:,:,2) = yellowMasks{100};               % green channel on
 
 % Build an alpha channel: opaque (1) for red or yellow pixels, transparent (0) otherwise.
 alphaChannel = double(redMask | yellowMask);
