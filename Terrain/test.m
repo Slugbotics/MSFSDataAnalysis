@@ -58,14 +58,46 @@ RGB(:,:,2) = RGB(:,:,2) | greenOnlyMask;  % ensure green channel is on for green
 % Build an alpha channel: opaque (1) for red, yellow, or green pixels, transparent (0) otherwise.
 alphaChannel = double(redMasks{time} | yellowMasks{time} | greenOnlyMask);
 
-%% Display the heatmap overlay on a satellite base (or fallback to grayscale DEM)
+%% Add a slider to control the timestep
+% Create a figure for the heatmap with a slider
 figure;
 hold on;
-    % If satellite imagery is not available, display the DEM in grayscale.
-    geoshow(A, R, 'DisplayType', 'texturemap');
-    colormap(gray);
 
-    % Now overlay the heatmap using the RGB image and the alpha channel.
-    geoshow(RGB, R, 'DisplayType', 'texturemap', 'FaceAlpha', 0.3);
+% Display the DEM in grayscale as a fallback
+geoshow(A, R, 'DisplayType', 'texturemap');
+colormap(gray);
+
+% Create the slider
+slider = uicontrol('Style', 'slider', ...
+                   'Min', first, ...
+                   'Max', last, ...
+                   'Value', first, ...
+                   'SliderStep', [1/(numIntervals-1), 1/(numIntervals-1)], ...
+                   'Units', 'normalized', ...
+                   'Position', [0.2, 0.01, 0.6, 0.05]);
+
+% Add a listener to update the heatmap when the slider value changes
+addlistener(slider, 'Value', 'PostSet', @(src, event) updateHeatmap(round(slider.Value)));
+
+% Initial heatmap overlay
+geoshow(RGB, R, 'DisplayType', 'texturemap', 'FaceAlpha', 0.3);
 hold off;
-title('Terrain Heatmap with Satellite Base');
+title('Terrain Heatmap with Slider Control');
+
+%% Callback function to update the heatmap
+function updateHeatmap(selectedTime)
+    % Update the RGB image based on the selected timestep
+    RGB(:,:,1) = redMasks{selectedTime} | yellowMasks{selectedTime}; % Red channel
+    RGB(:,:,2) = yellowMasks{selectedTime} | ...
+                 (greenMasks{selectedTime} & ~redMasks{selectedTime} & ~yellowMasks{selectedTime}); % Green channel
+
+    % Update the alpha channel
+    alphaChannel = double(redMasks{selectedTime} | yellowMasks{selectedTime} | ...
+                          (greenMasks{selectedTime} & ~redMasks{selectedTime} & ~yellowMasks{selectedTime}));
+
+    % Refresh the heatmap display
+    hold on;
+    geoshow(RGB, R, 'DisplayType', 'texturemap', 'FaceAlpha', 0.3);
+    hold off;
+    title(['Terrain Heatmap - Timestep: ', num2str(selectedTime)]);
+end
