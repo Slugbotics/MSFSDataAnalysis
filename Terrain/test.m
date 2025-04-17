@@ -38,72 +38,72 @@ for idx = 1:numIntervals
 
 end
 
-%% Display the heatmap overlay with an interactive slider
-% Create a figure
-figure;
+%% Build an RGB image for the heatmap
+% Initialize an RGB image array the same size as the DEM.
+RGB = zeros([size(A) 3]);
 
-% Create a slider for selecting the time (index in `indices`)
+% For red pixels, set the red channel to 1.
+RGB(:,:,1) = redMasks{1};
+
+time = first;
+
+% For yellow pixels, set red and green channels to 1.
+RGB(:,:,1) = RGB(:,:,1) | yellowMasks{time};  % ensure red channel is on for yellow too
+RGB(:,:,2) = RGB(:,:,2) | yellowMasks{time};  % ensure green channel is on for yellow
+
+% For green pixels, set only the green channel to 1 where red or yellow aren't.
+greenOnlyMask = greenMasks{time} & ~redMasks{time} & ~yellowMasks{time};
+RGB(:,:,2) = RGB(:,:,2) | greenOnlyMask;  % ensure green channel is on for green-only areas
+
+% Build an alpha channel: opaque (1) for red, yellow, or green pixels, transparent (0) otherwise.
+alphaChannel = double(redMasks{time} | yellowMasks{time} | greenOnlyMask);
+
+%% Create a figure with a slider for interaction
+figure;
+hold on;
+
+% Display the DEM in grayscale as the base layer
+geoshow(A, R, 'DisplayType', 'texturemap');
+colormap(gray);
+
+% Create a slider for selecting the time index
 slider = uicontrol('Style', 'slider', ...
                    'Min', 1, 'Max', numIntervals, ...
                    'Value', 1, ...
-                   'SliderStep', [1/(numIntervals-1), 1/(numIntervals-1)], ...
-                   'Position', [20, 20, 300, 20], ...
-                   'Callback', @updateVisualization);
+                   'SliderStep', [1/(numIntervals-1) 1/(numIntervals-1)], ...
+                   'Position', [20 20 300 20]);
 
-% Add a text label to display the current time value
-timeLabel = uicontrol('Style', 'text', ...
-                      'Position', [330, 20, 50, 20], ...
-                      'String', '1');
+% Add a text label to display the current time index
+sliderLabel = uicontrol('Style', 'text', ...
+                        'Position', [330 20 50 20], ...
+                        'String', sprintf('Idx: %d', first));
 
-% Initial rendering
-time = first;
-renderVisualization();
+% Callback function to update the heatmap when the slider is moved
+function updateHeatmap(~, ~)
+    % Get the current slider value and round it to the nearest index
+    sliderValue = round(slider.Value);
+    time = indices(sliderValue);
 
-% Callback function for slider
-function updateVisualization(src, ~)
-    % Update the time variable based on the slider value
-    timeIdx = round(src.Value); % Get the rounded slider value
-    time = indices(timeIdx);    % Map slider value to the corresponding index in `indices`
-    
-    % Update the label to show the current time index
-    timeLabel.String = num2str(timeIdx);
-    
-    % Re-render the visualization
-    renderVisualization();
-end
-
-% Function to render the visualization
-function renderVisualization()
-    % Clear the current figure
-    clf;
-
-    % Build the RGB image for the current time
+    % Update the RGB image for the selected time
     RGB = zeros([size(A) 3]);
-
-    % For red pixels, set the red channel to 1.
-    RGB(:,:,1) = redMasks{time};
-
-    % For yellow pixels, set red and green channels to 1.
-    RGB(:,:,1) = RGB(:,:,1) | yellowMasks{time};  % ensure red channel is on for yellow too
-    RGB(:,:,2) = RGB(:,:,2) | yellowMasks{time};  % ensure green channel is on for yellow
-
-    % For green pixels, set only the green channel to 1 where red or yellow aren't.
+    RGB(:,:,1) = redMasks{time};  % Red channel
+    RGB(:,:,1) = RGB(:,:,1) | yellowMasks{time};  % Yellow affects red channel
+    RGB(:,:,2) = RGB(:,:,2) | yellowMasks{time};  % Yellow affects green channel
     greenOnlyMask = greenMasks{time} & ~redMasks{time} & ~yellowMasks{time};
-    RGB(:,:,2) = RGB(:,:,2) | greenOnlyMask;  % ensure green channel is on for green-only areas
+    RGB(:,:,2) = RGB(:,:,2) | greenOnlyMask;  % Green-only areas
 
-    % Build an alpha channel: opaque (1) for red, yellow, or green pixels, transparent (0) otherwise.
-    alphaChannel = double(redMasks{time} | yellowMasks{time} | greenOnlyMask);
+    % Update the heatmap overlay
+    geoshow(RGB, R, 'DisplayType', 'texturemap', 'FaceAlpha', 0.3);
 
-    % Display the heatmap overlay on a satellite base (or fallback to grayscale DEM)
-    hold on;
-        % If satellite imagery is not available, display the DEM in grayscale.
-        geoshow(A, R, 'DisplayType', 'texturemap');
-        colormap(gray);
-
-        % Now overlay the heatmap using the RGB image and the alpha channel.
-        geoshow(RGB, R, 'DisplayType', 'texturemap', 'FaceAlpha', 0.3);
-    hold off;
-
-    % Add a title to indicate the current time index
-    title(['Terrain Heatmap for Index: ', num2str(time)]);
+    % Update the slider label
+    sliderLabel.String = sprintf('Idx: %d', time);
 end
+
+% Set the slider callback to the updateHeatmap function
+slider.Callback = @updateHeatmap;
+
+% Initialize the heatmap for the first time index
+updateHeatmap();
+
+hold off;
+title('Terrain Heatmap with Interactive Slider');
