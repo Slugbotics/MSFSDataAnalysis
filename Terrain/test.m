@@ -9,7 +9,7 @@ first = timestep(1);
 middle = timestep(round(numIntervals / 2));
 last = timestep(end);
 
-time = first;
+time = middle;
 
 %% Read the terrain data from a .tif file
 % This reads the DEM (Digital Elevation Model) and its spatial referencing info.
@@ -21,10 +21,6 @@ time = first;
 redMasks = cell(length(heightList), 1);
 yellowMasks = cell(length(heightList), 1);
 
-% Define the thresholds for the current height
-redThreshold = heightList(i) - 100;     % 100 ft below or above => red
-yellowLow = heightList(i) - 1000;       % 1000 ft below the ref altitude
-yellowHigh = heightList(i) - 100;       % upper limit for yellow
 
 % Initialize a cell array to store masks for each index of heightList
 redMasks = cell(length(heightList), 1);
@@ -77,7 +73,7 @@ slider = uicontrol('Style', 'slider', ...
                    'Position', [0.2, 0.01, 0.6, 0.05]);
 
 % Add a listener to update the heatmap when the slider value changes
-addlistener(slider, 'Value', 'PostSet', @(src, event) updateHeatmap(round(slider.Value)));
+addlistener(slider, 'Value', 'PostSet', @(src, event) updateHeatmap(round(slider.Value), redMasks, yellowMasks, greenMasks, R));
 
 % Initial heatmap overlay
 geoshow(RGB, R, 'DisplayType', 'texturemap', 'FaceAlpha', 0.3);
@@ -85,7 +81,10 @@ hold off;
 title('Terrain Heatmap with Slider Control');
 
 %% Callback function to update the heatmap
-function updateHeatmap(selectedTime)
+function updateHeatmap(selectedTime, redMasks, yellowMasks, greenMasks, R)
+    % Initialize an RGB image array the same size as the DEM
+    RGB = zeros([size(redMasks{selectedTime}), 3]);
+
     % Update the RGB image based on the selected timestep
     RGB(:,:,1) = redMasks{selectedTime} | yellowMasks{selectedTime}; % Red channel
     RGB(:,:,2) = yellowMasks{selectedTime} | ...
