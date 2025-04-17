@@ -9,6 +9,8 @@ first = timestep(1);
 middle = timestep(round(numIntervals / 2));
 last = timestep(end);
 
+time = first;
+
 %% Read the terrain data from a .tif file
 % This reads the DEM (Digital Elevation Model) and its spatial referencing info.
 % Replace 'terrain.tif' with your file.
@@ -44,8 +46,6 @@ RGB = zeros([size(A) 3]);
 
 % For red pixels, set the red channel to 1.
 RGB(:,:,1) = redMasks{1};
-
-time = first;
 
 % For yellow pixels, set red and green channels to 1.
 RGB(:,:,1) = RGB(:,:,1) | yellowMasks{time};  % ensure red channel is on for yellow too
