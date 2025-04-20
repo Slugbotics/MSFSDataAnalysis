@@ -1,0 +1,71 @@
+function geoPlotTrace(pts, p_lat, p_lon, a_msl, all)
+% geoPlotTrace  Plot points on a 2‑D map.=
+%   • Plots every point on a geographic axes.  
+%   • Ground points (alt = 0) appear as black triangles.  
+%   • Airborne points are colored by altitude (a colorbar is shown).  
+
+    % --- Get the [lat lon alt] matrix -------------------------------
+    % pts = extractLatLonAlt(jsonFile);          % <-- function from previous step
+    length(pts);
+    lat = pts(:,1);
+    lon = pts(:,2);
+    alt = pts(:,3);
+
+    % --- Create map axes --------------------------------------------
+    figure('Name','Flight Trace','Color','w');
+    gx = geoaxes;                      % interactive axes (pan / scroll wheel)
+    geobasemap(gx,'streets');          % choose any built‑in base map
+
+    hold(gx,'on')
+
+    % --- Plot ground vs. airborne segments --------------------------
+    gnd   = alt == 0;                  % logical indices
+    air   = ~gnd;
+
+    % Ground: black triangles
+    geoscatter(gx,lat(gnd),lon(gnd),10,'k','^',...
+               'DisplayName','Ground');
+    
+    if all
+        % Airborne: filled circles colored by altitude
+        hAir = geoscatter(gx,lat(air),lon(air),10,alt(air),...
+                          'filled','o','DisplayName','Airborne');
+    end
+    latitudes = p_lat;
+    longitudes = p_lon;
+    
+    % Check if the number of latitude and longitude data points match
+    if height(latitudes) ~= height(longitudes)
+        error('The number of latitude and longitude points must match.');
+    end
+    geoscatter(gx,latitudes,longitudes,50,a_msl,...
+                      'filled','o','DisplayName','Aircraft');
+
+    redLat = [];
+    redLon = [];
+    redAlt = [];
+    
+    % Loop over all points to check the boundary condition for each
+    for j = 1:length(p_lat)
+        for i = 1:length(lat)
+            % Find the closest latitude, longitude, and altitude from the aircraft data
+            dist = euclidean_distance(lat(i), lon(i), p_lat(j), p_lon(j));
+            alt_diff = abs(alt(i) - a_msl(j));
+    
+            % Apply the boundary condition
+            if dist < 3 && alt_diff < 1000
+                redLat = [redLat; lat(i)];
+                redLon = [redLon; lon(i)];
+                redAlt = [redAlt; round(alt(i))];  % You can adjust rounding as needed
+            end
+        end
+    end
+    geoscatter(gx, redLat, redLon, 30, 'r', 'filled', 'o', 'DisplayName', 'Within Boundary');
+
+
+    colorbar('eastoutside'), ylabel(colorbar,'Altitude')
+
+    % --- Decorations -------------------------------------------------
+    title(gx,'Flight Trace (latitude / longitude)');
+    legend('Location','best')
+end
