@@ -122,7 +122,7 @@ function updateOptimizedHeatmap(selectedIdx, A_resized, redMasks_resized, yellow
     cla;
 
     % Display the grayscale terrain map as the base layer
-    geoshow(flipud(A_resized), R_resized, 'DisplayType', 'texturemap');
+    geoshow(A_resized, R_resized, 'DisplayType', 'texturemap'); % Removed flipud
     colormap(gray); % Set the colormap to grayscale
     hold on;
 
