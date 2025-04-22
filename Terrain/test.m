@@ -118,6 +118,9 @@ title('Optimized Terrain Heatmap with Slider Control');
 
 %% Callback function to update the optimized heatmap
 function updateOptimizedHeatmap(selectedIdx, redMasks_resized, yellowMasks_resized, greenMasks_resized, R_resized, timestep)
+    % Clear the current axes to prevent overlapping layers
+    cla;
+
     % Initialize an RGB image array the same size as the resized DEM
     RGB_resized = zeros([size(redMasks_resized{selectedIdx}), 3]);
 
@@ -131,8 +134,6 @@ function updateOptimizedHeatmap(selectedIdx, redMasks_resized, yellowMasks_resiz
                                   (greenMasks_resized{selectedIdx} & ~redMasks_resized{selectedIdx} & ~yellowMasks_resized{selectedIdx}));
 
     % Refresh the heatmap display
-    hold on;
     geoshow(RGB_resized, R_resized, 'DisplayType', 'texturemap', 'FaceAlpha', 0.3);
-    hold off;
     title(['Optimized Terrain Heatmap - Timestep: ', num2str(timestep(selectedIdx))]);
 end
