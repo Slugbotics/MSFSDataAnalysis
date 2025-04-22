@@ -118,13 +118,18 @@ title('Optimized Terrain Heatmap with Slider Control');
 
 %% Callback function to update the optimized heatmap
 function updateOptimizedHeatmap(selectedIdx, A_resized, redMasks_resized, yellowMasks_resized, greenMasks_resized, R_resized, timestep, latList, lonList, heightList)
-    % Clear the current axes to prevent overlapping layers
-    cla;
+    % Create a geographic axes if it doesn't exist
+    persistent geoAx;
+    if isempty(geoAx) || ~isvalid(geoAx)
+        figure;
+        geoAx = geoaxes; % Create a geographic axes
+    end
+    hold(geoAx, 'off'); % Clear previous content
 
     % Display the grayscale terrain map as the base layer
-    geoshow(A_resized, R_resized, 'DisplayType', 'texturemap'); % Removed flipud
-    colormap(gray); % Set the colormap to grayscale
-    hold on;
+    geoshow(geoAx, A_resized, R_resized, 'DisplayType', 'texturemap'); % Removed flipud
+    colormap(geoAx, gray); % Set the colormap to grayscale
+    hold(geoAx, 'on');
 
     % Initialize an RGB image array the same size as the resized DEM
     RGB_resized = zeros([size(redMasks_resized{selectedIdx}), 3]);
@@ -134,28 +139,24 @@ function updateOptimizedHeatmap(selectedIdx, A_resized, redMasks_resized, yellow
     RGB_resized(:,:,2) = yellowMasks_resized{selectedIdx} | ...
                          (greenMasks_resized{selectedIdx} & ~redMasks_resized{selectedIdx} & ~yellowMasks_resized{selectedIdx}); % Green channel
 
-    % Update the alpha channel
-    alphaChannel_resized = double(redMasks_resized{selectedIdx} | yellowMasks_resized{selectedIdx} | ...
-                                  (greenMasks_resized{selectedIdx} & ~redMasks_resized{selectedIdx} & ~yellowMasks_resized{selectedIdx}));
-
     % Overlay the RGB heatmap on top of the grayscale terrain map
-    geoshow(RGB_resized, R_resized, 'DisplayType', 'texturemap', 'FaceAlpha', 0.3);
+    geoshow(geoAx, RGB_resized, R_resized, 'DisplayType', 'texturemap', 'FaceAlpha', 0.3);
 
     % Overlay the aircraft's path
     selectedLatitudes = latList(timestep);
     selectedLongitudes = lonList(timestep);
-    geoplot(selectedLatitudes, selectedLongitudes, '-o', 'LineWidth', 2, 'MarkerSize', 5, 'Color', "b");
+    geoplot(geoAx, selectedLatitudes, selectedLongitudes, '-o', 'LineWidth', 2, 'MarkerSize', 5, 'Color', "b");
 
     % Annotate the current position with altitude
     currentLat = latList(timestep(selectedIdx));
     currentLon = lonList(timestep(selectedIdx));
     currentAlt = heightList(timestep(selectedIdx));
-    geoscatter(currentLat, currentLon, 100, "r", "filled"); % Highlight the current position
-    textm(currentLat, currentLon, sprintf('%.0f ft', currentAlt), 'Color', 'white', 'FontSize', 8);
+    geoscatter(geoAx, currentLat, currentLon, 100, "r", "filled"); % Highlight the current position
+    text(geoAx, currentLon, currentLat, sprintf('%.0f ft', currentAlt), 'Color', 'white', 'FontSize', 8);
 
     % Update the title with the current timestep
-    title(['Optimized Terrain Heatmap - Timestep: ', num2str(timestep(selectedIdx))]);
-    hold off;
+    title(geoAx, ['Optimized Terrain Heatmap - Timestep: ', num2str(timestep(selectedIdx))]);
+    hold(geoAx, 'off');
 end
 
 %% Aircraft Position Plot for Selected Timesteps
