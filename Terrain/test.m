@@ -72,32 +72,8 @@ slider = uicontrol('Style', 'slider', ...
                    'Units', 'normalized', ...
                    'Position', [0.2, 0.01, 0.6, 0.05]);
 
-% Add a timer object to control the update rate
-updateTimer = timer('ExecutionMode', 'singleShot', ...
-                    'StartDelay', 0.2, ... % Delay in seconds (adjust as needed)
-                    'TimerFcn', @(~,~) executeUpdate());
-
-% Variable to store the selected time for the next update
-pendingTime = time;
-
-% Modify the slider listener to call the intermediary function
-addlistener(slider, 'Value', 'PostSet', @(src, event) rateLimitedUpdate(round(slider.Value)));
-
-% Intermediary function to handle rate-limiting
-function rateLimitedUpdate(selectedTime)
-    % Update the pending time
-    pendingTime = selectedTime;
-
-    % Restart the timer to delay the update
-    stop(updateTimer); % Stop the timer if it's already running
-    start(updateTimer); % Start the timer again
-end
-
-% Function executed by the timer to update the heatmap
-function executeUpdate()
-    % Call the updateHeatmap function with the pending time
-    updateHeatmap(pendingTime, redMasks, yellowMasks, greenMasks, R);
-end
+% Add a listener to update the heatmap when the slider value changes
+addlistener(slider, 'Value', 'PostSet', @(src, event) updateHeatmap(round(slider.Value), redMasks, yellowMasks, greenMasks, R));
 
 % Initial heatmap overlay
 geoshow(RGB, R, 'DisplayType', 'texturemap', 'FaceAlpha', 0.3);
