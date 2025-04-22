@@ -109,15 +109,15 @@ slider = uicontrol('Style', 'slider', ...
                    'Position', [0.2, 0.01, 0.6, 0.05]);
 
 % Add a listener to update the heatmap when the slider value changes
-addlistener(slider, 'Value', 'PostSet', @(src, event) updateOptimizedHeatmap(round(slider.Value), A_resized, redMasks_resized, yellowMasks_resized, greenMasks_resized, R_resized, timestep));
+addlistener(slider, 'Value', 'PostSet', @(src, event) updateOptimizedHeatmap(round(slider.Value), A_resized, redMasks_resized, yellowMasks_resized, greenMasks_resized, R_resized, timestep, latList, lonList));
 
 % Initial heatmap overlay for the first timestep
-updateOptimizedHeatmap(1, A_resized, redMasks_resized, yellowMasks_resized, greenMasks_resized, R_resized, timestep);
+updateOptimizedHeatmap(1, A_resized, redMasks_resized, yellowMasks_resized, greenMasks_resized, R_resized, timestep, latList, lonList);
 hold off;
 title('Optimized Terrain Heatmap with Slider Control');
 
 %% Callback function to update the optimized heatmap
-function updateOptimizedHeatmap(selectedIdx, A_resized, redMasks_resized, yellowMasks_resized, greenMasks_resized, R_resized, timestep)
+function updateOptimizedHeatmap(selectedIdx, A_resized, redMasks_resized, yellowMasks_resized, greenMasks_resized, R_resized, timestep, latList, lonList)
     % Clear the current axes to prevent overlapping layers
     cla;
 
@@ -145,8 +145,8 @@ function updateOptimizedHeatmap(selectedIdx, A_resized, redMasks_resized, yellow
     geoplot(latList, lonList, '-o', 'LineWidth', 2, 'MarkerSize', 5, 'Color', 'g'); % Green line for the path
 
     % Highlight the aircraft's current position
-    currentLat = latitudes(timestep(selectedIdx));
-    currentLon = longitudes(timestep(selectedIdx));
+    currentLat = latList(timestep(selectedIdx));
+    currentLon = lonList(timestep(selectedIdx));
     geoplot(currentLat, currentLon, 'o', 'MarkerSize', 10, 'MarkerFaceColor', 'r', 'MarkerEdgeColor', 'k'); % Red marker for current position
 
     % Update the title with the current timestep
