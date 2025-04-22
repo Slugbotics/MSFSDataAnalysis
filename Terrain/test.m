@@ -55,6 +55,9 @@ targetResolution = round(axesPixelSize);
 % Downsample the DEM
 A_resized = imresize(A, targetResolution);
 
+% Adjust the spatial referencing object to match the downsampled resolution
+R_resized = maprefcells(R.XWorldLimits, R.YWorldLimits, size(A_resized));
+
 % Downsample the masks for each timestep
 redMasks_resized = cell(numIntervals, 1);
 yellowMasks_resized = cell(numIntervals, 1);
@@ -90,11 +93,11 @@ figure;
 hold on;
 
 % Display the downsampled DEM in grayscale as a fallback
-geoshow(A_resized, R, 'DisplayType', 'texturemap');
+geoshow(A_resized, R_resized, 'DisplayType', 'texturemap');
 colormap(gray);
 
 % Initial heatmap overlay
-geoshow(RGB_resized, R, 'DisplayType', 'texturemap', 'FaceAlpha', 0.3);
+geoshow(RGB_resized, R_resized, 'DisplayType', 'texturemap', 'FaceAlpha', 0.3);
 hold off;
 title('Terrain Heatmap with Slider Control (Optimized)');
 
