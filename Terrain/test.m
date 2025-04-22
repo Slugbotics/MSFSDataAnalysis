@@ -56,7 +56,7 @@ targetResolution = round(axesPixelSize);
 A_resized = imresize(A, targetResolution);
 
 % Adjust the spatial referencing object to match the downsampled resolution
-R_resized = maprefcells(R.XWorldLimits, R.YWorldLimits, size(A_resized));
+R_resized = georefcells(R.LatitudeLimits, R.LongitudeLimits, size(A_resized));
 
 % Downsample the masks for each timestep
 redMasks_resized = cell(numIntervals, 1);
