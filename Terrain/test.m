@@ -90,21 +90,7 @@ RGB_resized(:,:,2) = RGB_resized(:,:,2) | greenOnlyMask_resized;  % ensure green
 % Build an alpha channel: opaque (1) for red, yellow, or green pixels, transparent (0) otherwise.
 alphaChannel_resized = double(redMasks_resized{1} | yellowMasks_resized{1} | greenOnlyMask_resized);
 
-%% Display the Downsampled Heatmap
-% Create a figure for the heatmap with a slider
-figure;
-hold on;
-
-% Display the downsampled DEM in grayscale as a fallback
-geoshow(A_resized, R_resized, 'DisplayType', 'texturemap');
-colormap(gray);
-
-% Initial heatmap overlay
-geoshow(RGB_resized, R_resized, 'DisplayType', 'texturemap', 'FaceAlpha', 0.3);
-hold off;
-title('Terrain Heatmap with Slider Control (Optimized)');
-
-%% Add a slider to control the timestep for the optimized heatmap
+%% Display the Downsampled Heatmap with Slider Control
 % Create a figure for the optimized heatmap with a slider
 figure;
 hold on;
@@ -112,11 +98,6 @@ hold on;
 % Display the downsampled DEM in grayscale as a fallback
 geoshow(A_resized, R_resized, 'DisplayType', 'texturemap');
 colormap(gray);
-
-% Initial heatmap overlay
-geoshow(RGB_resized, R_resized, 'DisplayType', 'texturemap', 'FaceAlpha', 0.3);
-hold off;
-title('Optimized Terrain Heatmap with Slider Control');
 
 % Create the slider
 slider = uicontrol('Style', 'slider', ...
@@ -129,6 +110,11 @@ slider = uicontrol('Style', 'slider', ...
 
 % Add a listener to update the heatmap when the slider value changes
 addlistener(slider, 'Value', 'PostSet', @(src, event) updateOptimizedHeatmap(round(slider.Value), redMasks_resized, yellowMasks_resized, greenMasks_resized, R_resized, timestep));
+
+% Initial heatmap overlay for the first timestep
+updateOptimizedHeatmap(1, redMasks_resized, yellowMasks_resized, greenMasks_resized, R_resized, timestep);
+hold off;
+title('Optimized Terrain Heatmap with Slider Control');
 
 %% Callback function to update the optimized heatmap
 function updateOptimizedHeatmap(selectedIdx, redMasks_resized, yellowMasks_resized, greenMasks_resized, R_resized, timestep)
@@ -149,47 +135,4 @@ function updateOptimizedHeatmap(selectedIdx, redMasks_resized, yellowMasks_resiz
     geoshow(RGB_resized, R_resized, 'DisplayType', 'texturemap', 'FaceAlpha', 0.3);
     hold off;
     title(['Optimized Terrain Heatmap - Timestep: ', num2str(timestep(selectedIdx))]);
-end
-
-%% Add a slider to control the timestep
-% Create a figure for the heatmap with a slider
-figure;
-hold on;
-
-% Create the slider
-slider = uicontrol('Style', 'slider', ...
-                   'Min', 1, ...
-                   'Max', numIntervals, ...
-                   'Value', 1, ...
-                   'SliderStep', [1/(numIntervals-1), 1/(numIntervals-1)], ...
-                   'Units', 'normalized', ...
-                   'Position', [0.2, 0.01, 0.6, 0.05]);
-
-% Add a listener to update the heatmap when the slider value changes
-addlistener(slider, 'Value', 'PostSet', @(src, event) updateHeatmap(round(slider.Value), redMasks, yellowMasks, greenMasks, R, timestep));
-
-% Initial heatmap overlay
-geoshow(RGB, R, 'DisplayType', 'texturemap', 'FaceAlpha', 0.3);
-hold off;
-title('Terrain Heatmap with Slider Control');
-
-%% Callback function to update the heatmap
-function updateHeatmap(selectedIdx, redMasks, yellowMasks, greenMasks, R, timestep)
-    % Initialize an RGB image array the same size as the DEM
-    RGB = zeros([size(redMasks{selectedIdx}), 3]);
-
-    % Update the RGB image based on the selected timestep
-    RGB(:,:,1) = redMasks{selectedIdx} | yellowMasks{selectedIdx}; % Red channel
-    RGB(:,:,2) = yellowMasks{selectedIdx} | ...
-                 (greenMasks{selectedIdx} & ~redMasks{selectedIdx} & ~yellowMasks{selectedIdx}); % Green channel
-
-    % Update the alpha channel
-    alphaChannel = double(redMasks{selectedIdx} | yellowMasks{selectedIdx} | ...
-                          (greenMasks{selectedIdx} & ~redMasks{selectedIdx} & ~yellowMasks{selectedIdx}));
-
-    % Refresh the heatmap display
-    hold on;
-    geoshow(RGB, R, 'DisplayType', 'texturemap', 'FaceAlpha', 0.3);
-    hold off;
-    title(['Terrain Heatmap - Timestep: ', num2str(timestep(selectedIdx))]);
 end
