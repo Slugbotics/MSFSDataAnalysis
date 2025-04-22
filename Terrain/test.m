@@ -17,6 +17,9 @@ time = middle;
 [A, R] = readgeoraster('/TerrainData/output_USGS10m_eg.tif');
 
 %% Create masks based on the elevation relative to refAlt
+disp('Memory usage before creating masks:');
+memory;
+
 % Initialize containers for masks only for the selected timesteps
 redMasks = cell(numIntervals, 1);
 yellowMasks = cell(numIntervals, 1);
@@ -29,6 +32,9 @@ for idx = 1:numIntervals
     yellowMasks{idx} = (A >= heightList(i) - 1000) & (A < heightList(i) - 100);  % pixels within 1000 ft but not in red range
     greenMasks{idx} = (A < heightList(i) - 1000);                   % pixels that are below 1000 ft
 end
+
+disp('Memory usage after creating masks:');
+memory;
 
 %% Build an RGB image for the heatmap
 % Initialize an RGB image array the same size as the DEM.
@@ -47,6 +53,9 @@ RGB(:,:,2) = RGB(:,:,2) | greenOnlyMask;  % ensure green channel is on for green
 
 % Build an alpha channel: opaque (1) for red, yellow, or green pixels, transparent (0) otherwise.
 alphaChannel = double(redMasks{1} | yellowMasks{1} | greenOnlyMask);
+
+disp('Memory usage after building RGB image:');
+memory;
 
 %% Add a slider to control the timestep
 % Create a figure for the heatmap with a slider
