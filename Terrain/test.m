@@ -55,6 +55,9 @@ targetResolution = round(axesPixelSize);
 % Downsample the DEM
 A_resized = imresize(A, targetResolution);
 
+% Flip the downsampled DEM vertically to correct orientation
+A_resized = flipud(A_resized);
+
 % Adjust the spatial referencing object to match the downsampled resolution
 R_resized = georefcells(R.LatitudeLimits, R.LongitudeLimits, size(A_resized));
 
@@ -64,9 +67,9 @@ yellowMasks_resized = cell(numIntervals, 1);
 greenMasks_resized = cell(numIntervals, 1);
 
 for idx = 1:numIntervals
-    redMasks_resized{idx} = imresize(redMasks{idx}, targetResolution, 'nearest');
-    yellowMasks_resized{idx} = imresize(yellowMasks{idx}, targetResolution, 'nearest');
-    greenMasks_resized{idx} = imresize(greenMasks{idx}, targetResolution, 'nearest');
+    redMasks_resized{idx} = flipud(imresize(redMasks{idx}, targetResolution, 'nearest'));
+    yellowMasks_resized{idx} = flipud(imresize(yellowMasks{idx}, targetResolution, 'nearest'));
+    greenMasks_resized{idx} = flipud(imresize(greenMasks{idx}, targetResolution, 'nearest'));
 end
 
 %% Build an RGB image for the heatmap (using resized data)
@@ -105,10 +108,6 @@ title('Terrain Heatmap with Slider Control (Optimized)');
 % Create a figure for the heatmap with a slider
 figure;
 hold on;
-
-% Display the DEM in grayscale as a fallback
-geoshow(A, R, 'DisplayType', 'texturemap');
-colormap(gray);
 
 % Create the slider
 slider = uicontrol('Style', 'slider', ...
