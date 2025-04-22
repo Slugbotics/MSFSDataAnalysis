@@ -5,7 +5,7 @@ points = zeros(1, 3);
 k=1;
 
 added_tracks = false(1, numel(traces));   % one flag per trace cell
-for i = 1:length(dataStruct.p_lat)
+for i = 1:length(vtol.p_lat)
     
     latitude = vtol.p_lat(i);
     longitude = vtol.p_lon(i);
@@ -38,5 +38,5 @@ for i = 1:length(dataStruct.p_lat)
         end
     end
     fprintf('Latitude: %.2f, Longitude: %.2f, Altitude: %.2f\n', latitude, longitude, altitude);
-    fprintf('%d / %d\n', i, length(dataStruct.p_lat));
+    fprintf('%d / %d\n', i, length(vtol.p_lat));
 end
