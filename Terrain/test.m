@@ -109,15 +109,15 @@ slider = uicontrol('Style', 'slider', ...
                    'Position', [0.2, 0.01, 0.6, 0.05]);
 
 % Add a listener to update the heatmap when the slider value changes
-addlistener(slider, 'Value', 'PostSet', @(src, event) updateOptimizedHeatmap(round(slider.Value), A_resized, redMasks_resized, yellowMasks_resized, greenMasks_resized, R_resized, timestep, latList, lonList, heightList));
+addlistener(slider, 'Value', 'PostSet', @(src, event) updateOptimizedHeatmap(round(slider.Value), A_resized, redMasks_resized, yellowMasks_resized, greenMasks_resized, R_resized, timestep));
 
 % Initial heatmap overlay for the first timestep
-updateOptimizedHeatmap(1, A_resized, redMasks_resized, yellowMasks_resized, greenMasks_resized, R_resized, timestep, latList, lonList, heightList);
+updateOptimizedHeatmap(1, A_resized, redMasks_resized, yellowMasks_resized, greenMasks_resized, R_resized, timestep);
 hold off;
 title('Optimized Terrain Heatmap with Slider Control');
 
 %% Callback function to update the optimized heatmap
-function updateOptimizedHeatmap(selectedIdx, A_resized, redMasks_resized, yellowMasks_resized, greenMasks_resized, R_resized, timestep, latList, lonList, heightList)
+function updateOptimizedHeatmap(selectedIdx, A_resized, redMasks_resized, yellowMasks_resized, greenMasks_resized, R_resized, timestep)
     % Clear the current axes to prevent overlapping layers
     cla;
 
@@ -141,18 +141,6 @@ function updateOptimizedHeatmap(selectedIdx, A_resized, redMasks_resized, yellow
     % Overlay the RGB heatmap on top of the grayscale terrain map
     geoshow(RGB_resized, R_resized, 'DisplayType', 'texturemap', 'FaceAlpha', 0.3);
 
-    % Overlay the aircraft's path
-    selectedLatitudes = latList(timestep);
-    selectedLongitudes = lonList(timestep);
-    geoplot(selectedLatitudes, selectedLongitudes, '-o', 'LineWidth', 2, 'MarkerSize', 5, 'Color', "b");
-
-    % Annotate the current position with altitude
-    currentLat = latList(timestep(selectedIdx));
-    currentLon = lonList(timestep(selectedIdx));
-    currentAlt = heightList(timestep(selectedIdx));
-    geoscatter(currentLat, currentLon, 100, "r", "filled"); % Highlight the current position
-    textm(currentLat, currentLon, sprintf('%.0f ft', currentAlt), 'Color', 'white', 'FontSize', 8);
-
     % Update the title with the current timestep
     title(['Optimized Terrain Heatmap - Timestep: ', num2str(timestep(selectedIdx))]);
     hold off;
@@ -164,31 +152,27 @@ selectedLatitudes = latList(timestep);
 selectedLongitudes = lonList(timestep);
 selectedAltitudes = heightList(timestep);
 
-% Create a new figure with geographic axes
+% Create a geographic plot
 figure;
-geoAx = geoaxes; % Create geographic axes
-hold(geoAx, 'on');
+geoplot(selectedLatitudes, selectedLongitudes, '-o', 'LineWidth', 2, 'MarkerSize', 5, 'Color', "b");
+geobasemap('satellite'); % Set the basemap to satellite
 
-% Plot the aircraft's path
-geoplot(geoAx, selectedLatitudes, selectedLongitudes, '-o', 'LineWidth', 2, 'MarkerSize', 5, 'Color', "b");
-geobasemap(geoAx, 'satellite'); % Set the basemap to satellite
+% Add labels and title
+title('Aircraft Position at Selected Timesteps');
+xlabel('Longitude');
+ylabel('Latitude');
 
 % Annotate the plot with altitude information
 for i = 1:length(selectedLatitudes)
-    % Use geoscatter to mark the points and add altitude annotations
-    geoscatter(geoAx, selectedLatitudes(i), selectedLongitudes(i), 50, "r", "filled");
-    text(geoAx, selectedLongitudes(i), selectedLatitudes(i), ...
+    text(selectedLongitudes(i), selectedLatitudes(i), ...
         sprintf('%.0f ft', selectedAltitudes(i)), ...
         'VerticalAlignment', 'bottom', 'HorizontalAlignment', 'right', ...
         'FontSize', 8, 'Color', 'white');
 end
 
-% Add labels and title
-title(geoAx, 'Aircraft Position at Selected Timesteps');
-
 % Adjust the view to ensure the entire path is visible
-geolimits(geoAx, [min(selectedLatitudes) - 0.01, max(selectedLatitudes) + 0.01], ...
-                 [min(selectedLongitudes) - 0.01, max(selectedLongitudes) + 0.01]);
+geolimits([min(selectedLatitudes) - 0.01, max(selectedLatitudes) + 0.01], ...
+          [min(selectedLongitudes) - 0.01, max(selectedLongitudes) + 0.01]);
 
 % Display grid for better visual reference
-grid(geoAx, 'on');
+grid on;
