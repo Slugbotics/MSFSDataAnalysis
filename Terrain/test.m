@@ -142,9 +142,7 @@ function updateOptimizedHeatmap(selectedIdx, A_resized, redMasks_resized, yellow
     geoshow(RGB_resized, R_resized, 'DisplayType', 'texturemap', 'FaceAlpha', 0.3);
 
     % Plot the aircraft's path
-    latitudes = p_lat; % Latitude data
-    longitudes = p_lon; % Longitude data
-    geoplot(latitudes, longitudes, '-o', 'LineWidth', 2, 'MarkerSize', 5, 'Color', 'g'); % Green line for the path
+    geoplot(latList, lonList, '-o', 'LineWidth', 2, 'MarkerSize', 5, 'Color', 'g'); % Green line for the path
 
     % Highlight the aircraft's current position
     currentLat = latitudes(timestep(selectedIdx));
