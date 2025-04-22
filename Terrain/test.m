@@ -109,15 +109,15 @@ slider = uicontrol('Style', 'slider', ...
                    'Position', [0.2, 0.01, 0.6, 0.05]);
 
 % Add a listener to update the heatmap when the slider value changes
-addlistener(slider, 'Value', 'PostSet', @(src, event) updateOptimizedHeatmap(round(slider.Value), A_resized, redMasks_resized, yellowMasks_resized, greenMasks_resized, R_resized, timestep));
+addlistener(slider, 'Value', 'PostSet', @(src, event) updateOptimizedHeatmap(round(slider.Value), A_resized, redMasks_resized, yellowMasks_resized, greenMasks_resized, R_resized, timestep, latList, lonList, heightList));
 
 % Initial heatmap overlay for the first timestep
-updateOptimizedHeatmap(1, A_resized, redMasks_resized, yellowMasks_resized, greenMasks_resized, R_resized, timestep);
+updateOptimizedHeatmap(1, A_resized, redMasks_resized, yellowMasks_resized, greenMasks_resized, R_resized, timestep, latList, lonList, heightList);
 hold off;
 title('Optimized Terrain Heatmap with Slider Control');
 
 %% Callback function to update the optimized heatmap
-function updateOptimizedHeatmap(selectedIdx, A_resized, redMasks_resized, yellowMasks_resized, greenMasks_resized, R_resized, timestep)
+function updateOptimizedHeatmap(selectedIdx, A_resized, redMasks_resized, yellowMasks_resized, greenMasks_resized, R_resized, timestep, latList, lonList, heightList)
     % Clear the current axes to prevent overlapping layers
     cla;
 
@@ -140,6 +140,18 @@ function updateOptimizedHeatmap(selectedIdx, A_resized, redMasks_resized, yellow
 
     % Overlay the RGB heatmap on top of the grayscale terrain map
     geoshow(RGB_resized, R_resized, 'DisplayType', 'texturemap', 'FaceAlpha', 0.3);
+
+    % Overlay the aircraft's path
+    selectedLatitudes = latList(timestep);
+    selectedLongitudes = lonList(timestep);
+    geoplot(selectedLatitudes, selectedLongitudes, '-o', 'LineWidth', 2, 'MarkerSize', 5, 'Color', "b");
+
+    % Annotate the current position with altitude
+    currentLat = latList(timestep(selectedIdx));
+    currentLon = lonList(timestep(selectedIdx));
+    currentAlt = heightList(timestep(selectedIdx));
+    geoscatter(currentLat, currentLon, 100, "r", "filled"); % Highlight the current position
+    textm(currentLat, currentLon, sprintf('%.0f ft', currentAlt), 'Color', 'white', 'FontSize', 8);
 
     % Update the title with the current timestep
     title(['Optimized Terrain Heatmap - Timestep: ', num2str(timestep(selectedIdx))]);
