@@ -17,23 +17,17 @@ time = middle;
 [A, R] = readgeoraster('/TerrainData/output_USGS10m_eg.tif');
 
 %% Create masks based on the elevation relative to refAlt
-% Initialize a cell array to store masks for each index of heightList
-redMasks = cell(length(heightList), 1);
-yellowMasks = cell(length(heightList), 1);
-
-
-% Initialize a cell array to store masks for each index of heightList
-redMasks = cell(length(heightList), 1);
-yellowMasks = cell(length(heightList), 1);
-greenMasks = cell(length(heightList), 1);
+% Initialize containers for masks only for the selected timesteps
+redMasks = cell(numIntervals, 1);
+yellowMasks = cell(numIntervals, 1);
+greenMasks = cell(numIntervals, 1);
 
 for idx = 1:numIntervals
     i = timestep(idx);
     % Create logical masks for the current height
-    redMasks{i} = (A >= heightList(i) - 100);                     % pixels that are 100 ft below or above
-    yellowMasks{i} = (A >= heightList(i) - 1000) & (A < heightList(i) - 100);  % pixels within 1000 ft but not in red range
-    greenMasks{i} = (A < heightList(i) - 1000);                 % pixels that are below 1000 ft
-
+    redMasks{idx} = (A >= heightList(i) - 100);                     % pixels that are 100 ft below or above
+    yellowMasks{idx} = (A >= heightList(i) - 1000) & (A < heightList(i) - 100);  % pixels within 1000 ft but not in red range
+    greenMasks{idx} = (A < heightList(i) - 1000);                   % pixels that are below 1000 ft
 end
 
 %% Build an RGB image for the heatmap
@@ -44,15 +38,15 @@ RGB = zeros([size(A) 3]);
 RGB(:,:,1) = redMasks{1};
 
 % For yellow pixels, set red and green channels to 1.
-RGB(:,:,1) = RGB(:,:,1) | yellowMasks{time};  % ensure red channel is on for yellow too
-RGB(:,:,2) = RGB(:,:,2) | yellowMasks{time};  % ensure green channel is on for yellow
+RGB(:,:,1) = RGB(:,:,1) | yellowMasks{1};  % ensure red channel is on for yellow too
+RGB(:,:,2) = RGB(:,:,2) | yellowMasks{1};  % ensure green channel is on for yellow
 
 % For green pixels, set only the green channel to 1 where red or yellow aren't.
-greenOnlyMask = greenMasks{time} & ~redMasks{time} & ~yellowMasks{time};
+greenOnlyMask = greenMasks{1} & ~redMasks{1} & ~yellowMasks{1};
 RGB(:,:,2) = RGB(:,:,2) | greenOnlyMask;  % ensure green channel is on for green-only areas
 
 % Build an alpha channel: opaque (1) for red, yellow, or green pixels, transparent (0) otherwise.
-alphaChannel = double(redMasks{time} | yellowMasks{time} | greenOnlyMask);
+alphaChannel = double(redMasks{1} | yellowMasks{1} | greenOnlyMask);
 
 %% Add a slider to control the timestep
 % Create a figure for the heatmap with a slider
@@ -65,15 +59,15 @@ colormap(gray);
 
 % Create the slider
 slider = uicontrol('Style', 'slider', ...
-                   'Min', first, ...
-                   'Max', last, ...
-                   'Value', first, ...
+                   'Min', 1, ...
+                   'Max', numIntervals, ...
+                   'Value', 1, ...
                    'SliderStep', [1/(numIntervals-1), 1/(numIntervals-1)], ...
                    'Units', 'normalized', ...
                    'Position', [0.2, 0.01, 0.6, 0.05]);
 
 % Add a listener to update the heatmap when the slider value changes
-addlistener(slider, 'Value', 'PostSet', @(src, event) updateHeatmap(round(slider.Value), redMasks, yellowMasks, greenMasks, R));
+addlistener(slider, 'Value', 'PostSet', @(src, event) updateHeatmap(round(slider.Value), redMasks, yellowMasks, greenMasks, R, timestep));
 
 % Initial heatmap overlay
 geoshow(RGB, R, 'DisplayType', 'texturemap', 'FaceAlpha', 0.3);
@@ -81,22 +75,22 @@ hold off;
 title('Terrain Heatmap with Slider Control');
 
 %% Callback function to update the heatmap
-function updateHeatmap(selectedTime, redMasks, yellowMasks, greenMasks, R)
+function updateHeatmap(selectedIdx, redMasks, yellowMasks, greenMasks, R, timestep)
     % Initialize an RGB image array the same size as the DEM
-    RGB = zeros([size(redMasks{selectedTime}), 3]);
+    RGB = zeros([size(redMasks{selectedIdx}), 3]);
 
     % Update the RGB image based on the selected timestep
-    RGB(:,:,1) = redMasks{selectedTime} | yellowMasks{selectedTime}; % Red channel
-    RGB(:,:,2) = yellowMasks{selectedTime} | ...
-                 (greenMasks{selectedTime} & ~redMasks{selectedTime} & ~yellowMasks{selectedTime}); % Green channel
+    RGB(:,:,1) = redMasks{selectedIdx} | yellowMasks{selectedIdx}; % Red channel
+    RGB(:,:,2) = yellowMasks{selectedIdx} | ...
+                 (greenMasks{selectedIdx} & ~redMasks{selectedIdx} & ~yellowMasks{selectedIdx}); % Green channel
 
     % Update the alpha channel
-    alphaChannel = double(redMasks{selectedTime} | yellowMasks{selectedTime} | ...
-                          (greenMasks{selectedTime} & ~redMasks{selectedTime} & ~yellowMasks{selectedTime}));
+    alphaChannel = double(redMasks{selectedIdx} | yellowMasks{selectedIdx} | ...
+                          (greenMasks{selectedIdx} & ~redMasks{selectedIdx} & ~yellowMasks{selectedIdx}));
 
     % Refresh the heatmap display
     hold on;
     geoshow(RGB, R, 'DisplayType', 'texturemap', 'FaceAlpha', 0.3);
     hold off;
-    title(['Terrain Heatmap - Timestep: ', num2str(selectedTime)]);
+    title(['Terrain Heatmap - Timestep: ', num2str(timestep(selectedIdx))]);
 end
