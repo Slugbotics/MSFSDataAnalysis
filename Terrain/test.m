@@ -104,6 +104,53 @@ geoshow(RGB_resized, R_resized, 'DisplayType', 'texturemap', 'FaceAlpha', 0.3);
 hold off;
 title('Terrain Heatmap with Slider Control (Optimized)');
 
+%% Add a slider to control the timestep for the optimized heatmap
+% Create a figure for the optimized heatmap with a slider
+figure;
+hold on;
+
+% Display the downsampled DEM in grayscale as a fallback
+geoshow(A_resized, R_resized, 'DisplayType', 'texturemap');
+colormap(gray);
+
+% Initial heatmap overlay
+geoshow(RGB_resized, R_resized, 'DisplayType', 'texturemap', 'FaceAlpha', 0.3);
+hold off;
+title('Optimized Terrain Heatmap with Slider Control');
+
+% Create the slider
+slider = uicontrol('Style', 'slider', ...
+                   'Min', 1, ...
+                   'Max', numIntervals, ...
+                   'Value', 1, ...
+                   'SliderStep', [1/(numIntervals-1), 1/(numIntervals-1)], ...
+                   'Units', 'normalized', ...
+                   'Position', [0.2, 0.01, 0.6, 0.05]);
+
+% Add a listener to update the heatmap when the slider value changes
+addlistener(slider, 'Value', 'PostSet', @(src, event) updateOptimizedHeatmap(round(slider.Value), redMasks_resized, yellowMasks_resized, greenMasks_resized, R_resized, timestep));
+
+%% Callback function to update the optimized heatmap
+function updateOptimizedHeatmap(selectedIdx, redMasks_resized, yellowMasks_resized, greenMasks_resized, R_resized, timestep)
+    % Initialize an RGB image array the same size as the resized DEM
+    RGB_resized = zeros([size(redMasks_resized{selectedIdx}), 3]);
+
+    % Update the RGB image based on the selected timestep
+    RGB_resized(:,:,1) = redMasks_resized{selectedIdx} | yellowMasks_resized{selectedIdx}; % Red channel
+    RGB_resized(:,:,2) = yellowMasks_resized{selectedIdx} | ...
+                         (greenMasks_resized{selectedIdx} & ~redMasks_resized{selectedIdx} & ~yellowMasks_resized{selectedIdx}); % Green channel
+
+    % Update the alpha channel
+    alphaChannel_resized = double(redMasks_resized{selectedIdx} | yellowMasks_resized{selectedIdx} | ...
+                                  (greenMasks_resized{selectedIdx} & ~redMasks_resized{selectedIdx} & ~yellowMasks_resized{selectedIdx}));
+
+    % Refresh the heatmap display
+    hold on;
+    geoshow(RGB_resized, R_resized, 'DisplayType', 'texturemap', 'FaceAlpha', 0.3);
+    hold off;
+    title(['Optimized Terrain Heatmap - Timestep: ', num2str(timestep(selectedIdx))]);
+end
+
 %% Add a slider to control the timestep
 % Create a figure for the heatmap with a slider
 figure;
