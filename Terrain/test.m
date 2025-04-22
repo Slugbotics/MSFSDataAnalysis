@@ -121,6 +121,11 @@ function updateOptimizedHeatmap(selectedIdx, redMasks_resized, yellowMasks_resiz
     % Clear the current axes to prevent overlapping layers
     cla;
 
+    % Display the grayscale terrain map as the base layer
+    geoshow(flipud(A_resized), R_resized, 'DisplayType', 'texturemap');
+    colormap(gray); % Set the colormap to grayscale
+    hold on;
+
     % Initialize an RGB image array the same size as the resized DEM
     RGB_resized = zeros([size(redMasks_resized{selectedIdx}), 3]);
 
@@ -133,7 +138,10 @@ function updateOptimizedHeatmap(selectedIdx, redMasks_resized, yellowMasks_resiz
     alphaChannel_resized = double(redMasks_resized{selectedIdx} | yellowMasks_resized{selectedIdx} | ...
                                   (greenMasks_resized{selectedIdx} & ~redMasks_resized{selectedIdx} & ~yellowMasks_resized{selectedIdx}));
 
-    % Refresh the heatmap display
+    % Overlay the RGB heatmap on top of the grayscale terrain map
     geoshow(RGB_resized, R_resized, 'DisplayType', 'texturemap', 'FaceAlpha', 0.3);
+
+    % Update the title with the current timestep
     title(['Optimized Terrain Heatmap - Timestep: ', num2str(timestep(selectedIdx))]);
+    hold off;
 end
