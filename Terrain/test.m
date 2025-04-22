@@ -36,26 +36,67 @@ end
 disp('Memory usage after creating masks:');
 memory;
 
-%% Build an RGB image for the heatmap
-% Initialize an RGB image array the same size as the DEM.
-RGB = zeros([size(A) 3]);
+%% Dynamically Determine Downsample Size
+% Create a temporary figure to get the axes size
+tempFig = figure('Visible', 'off'); % Create an invisible figure
+tempAxes = axes(tempFig); % Add axes to the figure
+
+% Get the size of the axes in pixels
+axesPosition = get(tempAxes, 'Position'); % Position in normalized units
+screenSize = get(0, 'ScreenSize'); % Screen size in pixels
+axesPixelSize = axesPosition(3:4) .* screenSize(3:4); % Convert to pixel size
+
+% Close the temporary figure
+close(tempFig);
+
+% Use the axes pixel size as the target resolution
+targetResolution = round(axesPixelSize);
+
+% Downsample the DEM
+A_resized = imresize(A, targetResolution);
+
+% Downsample the masks for each timestep
+redMasks_resized = cell(numIntervals, 1);
+yellowMasks_resized = cell(numIntervals, 1);
+greenMasks_resized = cell(numIntervals, 1);
+
+for idx = 1:numIntervals
+    redMasks_resized{idx} = imresize(redMasks{idx}, targetResolution, 'nearest');
+    yellowMasks_resized{idx} = imresize(yellowMasks{idx}, targetResolution, 'nearest');
+    greenMasks_resized{idx} = imresize(greenMasks{idx}, targetResolution, 'nearest');
+end
+
+%% Build an RGB image for the heatmap (using resized data)
+% Initialize an RGB image array the same size as the resized DEM.
+RGB_resized = zeros([size(A_resized) 3]);
 
 % For red pixels, set the red channel to 1.
-RGB(:,:,1) = redMasks{1};
+RGB_resized(:,:,1) = redMasks_resized{1};
 
 % For yellow pixels, set red and green channels to 1.
-RGB(:,:,1) = RGB(:,:,1) | yellowMasks{1};  % ensure red channel is on for yellow too
-RGB(:,:,2) = RGB(:,:,2) | yellowMasks{1};  % ensure green channel is on for yellow
+RGB_resized(:,:,1) = RGB_resized(:,:,1) | yellowMasks_resized{1};  % ensure red channel is on for yellow too
+RGB_resized(:,:,2) = RGB_resized(:,:,2) | yellowMasks_resized{1};  % ensure green channel is on for yellow
 
 % For green pixels, set only the green channel to 1 where red or yellow aren't.
-greenOnlyMask = greenMasks{1} & ~redMasks{1} & ~yellowMasks{1};
-RGB(:,:,2) = RGB(:,:,2) | greenOnlyMask;  % ensure green channel is on for green-only areas
+greenOnlyMask_resized = greenMasks_resized{1} & ~redMasks_resized{1} & ~yellowMasks_resized{1};
+RGB_resized(:,:,2) = RGB_resized(:,:,2) | greenOnlyMask_resized;  % ensure green channel is on for green-only areas
 
 % Build an alpha channel: opaque (1) for red, yellow, or green pixels, transparent (0) otherwise.
-alphaChannel = double(redMasks{1} | yellowMasks{1} | greenOnlyMask);
+alphaChannel_resized = double(redMasks_resized{1} | yellowMasks_resized{1} | greenOnlyMask_resized);
 
-disp('Memory usage after building RGB image:');
-memory;
+%% Display the Downsampled Heatmap
+% Create a figure for the heatmap with a slider
+figure;
+hold on;
+
+% Display the downsampled DEM in grayscale as a fallback
+geoshow(A_resized, R, 'DisplayType', 'texturemap');
+colormap(gray);
+
+% Initial heatmap overlay
+geoshow(RGB_resized, R, 'DisplayType', 'texturemap', 'FaceAlpha', 0.3);
+hold off;
+title('Terrain Heatmap with Slider Control (Optimized)');
 
 %% Add a slider to control the timestep
 % Create a figure for the heatmap with a slider
