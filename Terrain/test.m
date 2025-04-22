@@ -122,7 +122,7 @@ function updateOptimizedHeatmap(selectedIdx, A_resized, redMasks_resized, yellow
     cla;
 
     % Display the grayscale terrain map as the base layer
-    geoshow(A_resized, R_resized, 'DisplayType', 'texturemap'); % Removed flipud
+    geoshow(A_resized, R_resized, 'DisplayType', 'texturemap'); % Display terrain map
     colormap(gray); % Set the colormap to grayscale
     hold on;
 
@@ -140,6 +140,16 @@ function updateOptimizedHeatmap(selectedIdx, A_resized, redMasks_resized, yellow
 
     % Overlay the RGB heatmap on top of the grayscale terrain map
     geoshow(RGB_resized, R_resized, 'DisplayType', 'texturemap', 'FaceAlpha', 0.3);
+
+    % Plot the aircraft's path
+    latitudes = p_lat; % Latitude data
+    longitudes = p_lon; % Longitude data
+    geoplot(latitudes, longitudes, '-o', 'LineWidth', 2, 'MarkerSize', 5, 'Color', 'g'); % Green line for the path
+
+    % Highlight the aircraft's current position
+    currentLat = latitudes(timestep(selectedIdx));
+    currentLon = longitudes(timestep(selectedIdx));
+    geoplot(currentLat, currentLon, 'o', 'MarkerSize', 10, 'MarkerFaceColor', 'r', 'MarkerEdgeColor', 'k'); % Red marker for current position
 
     % Update the title with the current timestep
     title(['Optimized Terrain Heatmap - Timestep: ', num2str(timestep(selectedIdx))]);
